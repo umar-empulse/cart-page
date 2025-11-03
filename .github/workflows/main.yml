@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+# Trigger: When does this run?
+on:
+  push:
+    branches: [main] # Runs when you push to main branch
+  pull_request:
+    branches: [main] # Runs when someone creates a PR to main
+
+# Jobs: What should happen?
+jobs:
+  # Job 1: Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest # Use Ubuntu server
+
+    steps:
+      # Step 1: Get your code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Setup environment (example: Node.js)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm" # Speeds up by caching node_modules
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run tests
+      - name: Run tests
+        run: npm run test
+
+      # Step 5: Build the project
+      - name: Build
+        run: npm run build
+
+  # Job 2: Deploy (only runs if tests pass)
+  deploy:
+    needs: build-and-test # Wait for build-and-test to succeed
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # Only deploy from main branch
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+        # Download the built files
+    - name: Download build files
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist/
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production..."
+          # Add your actual deployment commands here
+          # For example: scp files to server, or use deployment service
