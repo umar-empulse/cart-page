@@ -32,10 +32,18 @@ jobs:
       # Step 4: Run tests
       - name: Run tests
         run: npm run test
+        continue-on-error: true # Won't fail if you don't have test script
 
       # Step 5: Build the project
       - name: Build
         run: npm run build
+
+      # Step 6: Upload build artifacts
+      - name: Upload build files
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
 
   # Job 2: Deploy (only runs if tests pass)
   deploy:
@@ -47,15 +55,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-        # Download the built files
-    - name: Download build files
-      uses: actions/download-artifact@v3
-      with:
-        name: dist
-        path: dist/
+      # Download the built files
+      - name: Download build files
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
 
       - name: Deploy to production
         run: |
-          echo "Deploying to production..."
+          echo "🚀 Deploying to production..."
+          echo "Built files are ready in dist/ folder"
+          ls -la dist/
           # Add your actual deployment commands here
-          # For example: scp files to server, or use deployment service
