@@ -13,6 +13,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest # Use Ubuntu server
 
+    permissions:
+      contents: write # Needed to push to gh-pages branch
+
     steps:
       # Step 1: Get your code
       - name: Checkout code
@@ -45,11 +48,14 @@ jobs:
           name: dist
           path: dist/
 
-  # Job 2: Deploy (only runs if tests pass)
+  # Job 2: Deploy to GitHub Pages
   deploy:
     needs: build-and-test # Wait for build-and-test to succeed
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' # Only deploy from main branch
+
+    permissions:
+      contents: write # Needed to push to gh-pages branch
 
     steps:
       - name: Checkout code
@@ -62,9 +68,9 @@ jobs:
           name: dist
           path: dist/
 
-      - name: Deploy to production
-        run: |
-          echo "🚀 Deploying to production..."
-          echo "Built files are ready in dist/ folder"
-          ls -la dist/
-          # Add your actual deployment commands here
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
