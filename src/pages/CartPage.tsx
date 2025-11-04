@@ -5,7 +5,7 @@ const CartPage = () => {
       <h1
         className="text-center text-[#191919] dark:text-white text-[32px] font-semibold leading-[38px]"
       >
-        My Shopping Cart
+        Shopping Cart
       </h1>
       <div className="flex items-start mt-8 gap-6">
         <div className="bg-white p-4 w-[800px] rounded-xl">
